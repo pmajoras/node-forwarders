@@ -1,0 +1,26 @@
+{
+  "name": "node-forwarders",
+  "version": "0.0.1",
+  "description": "node-forwarders",
+  "main": "index.js",
+  "dependencies": {},
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/pmajoras/node-forwarders)"
+  },
+  "keywords": [
+    "Nodejs",
+    "Forwarder"
+  ],
+  "author": "Paulo Gabriel Souza Poffal",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "mocha": "^3.0.0"
+  },
+  "engines": {
+    "node": "6.3.x"
+  }
+}
