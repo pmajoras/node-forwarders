@@ -1,22 +1,46 @@
 'use strict';
-var eslint = require('gulp-eslint');
 var gulp = require('gulp');
+var tslint = require('gulp-tslint');
+var ts = require('gulp-typescript');
+var nodemon = require('gulp-nodemon');
 
 var paths = {
-  appScripts: ['app/**/*.js']
+  appScripts: ['app/**/*.ts']
 };
 
-gulp.task('eslint:app', function () {
-  return gulp.src(paths.appScripts)
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
+gulp.task('ts:lint:app', () => {
+  gulp.src(paths.appScripts)
+    .pipe(tslint({
+      formatter: 'verbose'
+    }))
+    .pipe(tslint.report());
+});
+
+gulp.task('ts:compile:app', function () {
+  var tsResult = gulp.src(paths.appScripts)
+    .pipe(ts({
+      noImplicitAny: true
+    }));
+  return tsResult.js.pipe(gulp.dest('release'));
 });
 
 // configure which files to watch and what tasks to use on file changes
-gulp.task('watch:js', function () {
-  gulp.watch(paths.appScripts, ['eslint:app']);
+gulp.task('watch:ts', function () {
+  gulp.watch(paths.appScripts, ['ts:lint:app', 'ts:compile:app']);
 });
 
-// Builds the application
-gulp.task('default', ['eslint:app', 'watch:js']);
+gulp.task('build', ['ts:lint:app', 'ts:compile:app']);
+
+gulp.task('develop', function () {
+  gulp.start('build', () => {
+
+    nodemon({
+      script: 'release/index.js'
+      , ext: 'ts'
+      , ignore: ['release/*']
+      , tasks: ['build']
+    }).on('restart', function () {
+      console.log('restarted!');
+    });
+  });
+});

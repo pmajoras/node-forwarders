@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "node-forwarders",
   "main": "index.js",
-  "dependencies": {},
-  "scripts": {},
+  "dependencies": {
+    "chokidar": "^1.6.0"
+  },
+  "scripts": {
+    "development": "gulp develop"
+  },
   "repository": {
     "type": "git",
     "url": "(https://github.com/pmajoras/node-forwarders)"
@@ -18,7 +22,12 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
-    "mocha": "^3.0.0"
+    "gulp-nodemon": "^2.1.0",
+    "gulp-tslint": "^6.0.2",
+    "gulp-typescript": "^2.13.6",
+    "mocha": "^3.0.0",
+    "tslint": "^3.14.0",
+    "typescript": "^1.8.10"
   },
   "engines": {
     "node": "6.3.x"
