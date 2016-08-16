@@ -7,6 +7,9 @@
     "chokidar": "^1.6.0"
   },
   "scripts": {
+    "build": "gulp build",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha release/test/implementations/FileForwarderService/Constructor-test.js && remap-istanbul -i ./coverage/coverage.json -o ./coverage/html-report -t html",
+    "test": "npm run build && npm run cover",
     "development": "gulp develop"
   },
   "repository": {
@@ -20,12 +23,18 @@
   "author": "Paulo Gabriel Souza Poffal",
   "license": "MIT",
   "devDependencies": {
+    "chai": "^3.5.0",
+    "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-eslint": "^3.0.1",
     "gulp-nodemon": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^6.0.2",
     "gulp-typescript": "^2.13.6",
-    "mocha": "^3.0.0",
+    "intern": "^3.3.1",
+    "istanbul": "^0.4.4",
+    "mocha": "^3.0.2",
+    "remap-istanbul": "^0.6.4",
     "tslint": "^3.14.0",
     "typescript": "^1.8.10"
   },
