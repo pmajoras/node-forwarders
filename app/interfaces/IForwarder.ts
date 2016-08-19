@@ -1,10 +1,11 @@
 'use strict';
 import {IDisposable} from '../common/Common';
+import {ILogMessage} from './ILogMessage';
 
 export interface IForwarder extends IDisposable {
   /**
    *
-   * @param {string} content
+   * @param {Array<ILogMessage>} messages
    */
-  forward(content: string): void;
+  forward(messages: Array<ILogMessage>): void;
 }

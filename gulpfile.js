@@ -36,7 +36,8 @@ gulp.task('watch:ts', function () {
   gulp.watch(paths.appScripts, ['ts:lint:app', 'ts:compile:app']);
 });
 
-gulp.task('build', ['clean-release', 'ts:lint:app', 'ts:compile:app']);
+gulp.task('compile', ['ts:lint:app', 'ts:compile:app']);
+gulp.task('build', ['clean-release', 'compile']);
 
 gulp.task('develop', function () {
   gulp.start('build', () => {
