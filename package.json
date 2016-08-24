@@ -4,7 +4,8 @@
   "description": "node-forwarders",
   "main": "index.js",
   "dependencies": {
-    "chokidar": "^1.6.0"
+    "chokidar": "^1.6.0",
+    "request": "^2.74.0"
   },
   "scripts": {
     "build": "gulp build",

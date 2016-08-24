@@ -17,10 +17,6 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
     super();
 
     this.watcher = chokidar.watch(config.path, {});
-    this.watcher
-      .on('add', this.onFileAdded)
-      .on('change', this.onFileChanged)
-      .on('unlink', this.onFileRemoved);
   }
 
   private watcher: FSWatcher;
@@ -32,9 +28,16 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
 
   addNewMessagesListener(listener: Function) {
     this.addListener(events.newMessage, listener);
+    this.watcher
+      .on('add', this.onFileAdded)
+      .on('change', this.onFileChanged);
   }
+
   removeNewMessagesListener(listener: Function) {
-    this.addListener(events.newMessage, listener);
+    this.removeListener(events.newMessage, listener);
+    this.watcher
+      .removeListener('add', this.onFileAdded)
+      .removeListener('change', this.onFileChanged);
   }
 
   onFileAdded = (path: string) => {
@@ -43,10 +46,6 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
 
   onFileChanged = (path: string) => {
     readFile(path, this.handleFileRead);
-  }
-
-  onFileRemoved = (path: string) => {
-    console.log('onFileRemoved >> path');
   }
 
   dispose() {

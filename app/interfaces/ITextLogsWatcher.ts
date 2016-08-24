@@ -9,5 +9,4 @@ interface ILogsWatcher extends IDisposable {
 export interface ITextLogsWatcher extends ILogsWatcher {
   onFileAdded(path: string) : void;
   onFileChanged(path: string) : void;
-  onFileRemoved(path: string) : void;
 }
