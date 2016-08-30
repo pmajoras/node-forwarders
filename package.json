@@ -5,6 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "chokidar": "^1.6.0",
+    "mkdirp": "^0.5.1",
+    "q": "^1.4.1",
     "request": "^2.74.0"
   },
   "scripts": {

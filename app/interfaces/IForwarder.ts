@@ -1,11 +1,12 @@
 'use strict';
 import {IDisposable} from '../common/Common';
 import {ILogMessageContainer} from './ILogMessages';
+import {Promise} from 'q';
 
 export interface IForwarder extends IDisposable {
   /**
    *
-   * @param {Array<ILogMessage>} messages
+   * @param {Array<ILogMessageContainer>} messages
    */
-  forward(messageContainer: ILogMessageContainer): Promise<any>;
+  forward(messageContainer: Array<ILogMessageContainer>): Promise<any>;
 }

@@ -2,29 +2,53 @@
 import {IHttpForwarder} from '../interfaces/IHttpForwarder';
 import {ILogMessageContainer} from '../interfaces/ILogMessages';
 import * as request from 'request';
+import * as Q from 'q';
+
+interface IHttpConfig {
+  url: string;
+  appId: string;
+}
 
 export abstract class HttpForwarder implements IHttpForwarder {
-  constructor() {
+  constructor(config) {
+    console.log('suber');
+    config = config || {};
 
+    this.config = {
+      url: config.url,
+      appId: config.appId
+    };
   }
 
-  forward(messageContainer: ILogMessageContainer): Promise<any> {
+  private config: IHttpConfig;
 
-    var promise = new Promise((resolve, reject) => {
+  forward(messageContainer: Array<ILogMessageContainer>): Q.Promise<any> {
 
-      request.post({ url: 'http://service.com/upload', formData: {} }, function optionalCallback(err, httpResponse, body) {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        resolve(body);
+    let defer = Q.defer();
+    let messages = [];
+    messageContainer.forEach((message) => {
+      message.messages.forEach((messageValue) => {
+        messages.push(messageValue);
       });
     });
 
-    return promise;
+    let body = {
+      appId: this.config.appId,
+      messages: messages
+    };
+
+    request.post({ url: this.config.url, json: true, body: body }, (err, httpResponse, body) => {
+      if (err) {
+        defer.reject(err);
+      } else {
+        defer.resolve(body);
+      }
+    });
+
+    return defer.promise;
   }
 
   dispose() {
+    console.log('dispose');
   }
 }

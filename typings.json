@@ -1,0 +1,8 @@
+{
+  "globalDependencies": {
+    "q": "registry:dt/q#0.0.0+20160613154756"
+  },
+  "dependencies": {
+    "mkdirp": "registry:npm/mkdirp#0.5.0+20160723033700"
+  }
+}

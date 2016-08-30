@@ -18,19 +18,17 @@ export class FileForwarderService extends HttpForwarder implements IForwarderSer
 
   private watcher: ITextLogsWatcher;
   private isDisposed: boolean;
-  private handleNewMessages = (err: NodeJS.ErrnoException, messagesContainer: ILogMessageContainer) => {
-    if (!err) {
-      this.watcher.removeNewMessagesListener(this.handleNewMessages);
-
+  private handleNewMessages = (err: NodeJS.ErrnoException, messagesContainer: Array<ILogMessageContainer>) => {
+    if (err) {
+      console.log('handleNewMessages > err', err);
+    } else {
       this.forward(messagesContainer)
-        .then((response) => {
-          this.watcher.addNewMessagesListener(this.handleNewMessages);
+        .then((result) => {
+          console.log('forwardResult', result);
         })
         .catch((err) => {
-          this.watcher.addNewMessagesListener(this.handleNewMessages);
+          console.log('forwardError', err);
         });
-    } else {
-      console.log('handleNewMessages > err', err);
     }
   }
 
