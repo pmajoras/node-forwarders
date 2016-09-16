@@ -3,8 +3,8 @@
 import * as chokidar from 'chokidar';
 import { FileForwarderService } from './implementations/FileForwarderService';
 import { TextLogsWatcher } from './implementations/TextLogsWatcher';
+import { config } from './config';
 
-var service = new FileForwarderService(new TextLogsWatcher({path: 'C:/ProjetosGit/node-forwarders/test-directory/*.txt'}));
+var service = new FileForwarderService(new TextLogsWatcher({path: config.directoryPath}));
 service.onInit();
-console.log('test333');
 

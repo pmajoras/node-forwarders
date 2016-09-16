@@ -1,6 +1,6 @@
 'use strict';
 import {IHttpForwarder} from '../interfaces/IHttpForwarder';
-import {ILogMessageContainer} from '../interfaces/ILogMessages';
+import {ILogMessage} from '../interfaces/ILogMessages';
 import * as request from 'request';
 import * as Q from 'q';
 
@@ -10,7 +10,7 @@ interface IHttpConfig {
 }
 
 export abstract class HttpForwarder implements IHttpForwarder {
-  constructor(config) {
+  constructor(config: any) {
     console.log('suber');
     config = config || {};
 
@@ -22,19 +22,13 @@ export abstract class HttpForwarder implements IHttpForwarder {
 
   private config: IHttpConfig;
 
-  forward(messageContainer: Array<ILogMessageContainer>): Q.Promise<any> {
+  forward(message: ILogMessage): Q.Promise<any> {
 
     let defer = Q.defer();
-    let messages = [];
-    messageContainer.forEach((message) => {
-      message.messages.forEach((messageValue) => {
-        messages.push(messageValue);
-      });
-    });
 
     let body = {
       appId: this.config.appId,
-      messages: messages
+      message: message.message
     };
 
     request.post({ url: this.config.url, json: true, body: body }, (err, httpResponse, body) => {

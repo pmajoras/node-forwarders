@@ -1,5 +1,6 @@
 'use strict';
-import {FSWatcher, readFile, rename} from 'fs';
+import {FSWatcher, readFile, rename, createReadStream} from 'fs';
+import * as readline from 'readline';
 import {dirname, basename} from 'path';
 import * as mkdirp from 'mkdirp';
 import {ITextLogsWatcher} from '../interfaces/ITextLogsWatcher';
@@ -28,14 +29,14 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
   }
 
   private processTimer: NodeJS.Timer;
-  private filesToRead: Array<string> = [];
+  private filesToRead: Array<any> = [];
   private watcher: FSWatcher;
   private isDisposed: boolean;
 
   private process = () => {
     console.log('process');
 
-    this.processFiles(this.filesToRead)
+    this.processFiles(this.filesToRead.filter((file) => file.hasChanges))
       .then((messagesContainers) => {
         console.log('messagesContainers', messagesContainers);
         if (messagesContainers && messagesContainers.length > 0) {
@@ -45,53 +46,50 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
   }
 
   // TODO: Improve performance and create a class for this method.
-  private processFiles = (filesPaths: Array<string>): Q.IPromise<any> => {
+  private processFiles = (filesPaths: Array<any>): Q.IPromise<any> => {
     let deffered = Q.defer();
 
     if (Array.isArray(filesPaths) && filesPaths.length > 0) {
       let currentFileIndex = 0;
+      let currentFileObject = filesPaths[currentFileIndex];
       let promiseResult: Array<ILogMessageContainer> = [];
 
-      let handleFileReadRecursive = (err, content) => {
+      let readFileRecursive = (filePathObject) => {
+        let currentLine = 0;
         let fileResult = {
           messages: [],
-          filePath: filesPaths[currentFileIndex]
+          filePath: filePathObject.path
         };
+        let readLineInterface = readline.createInterface({
+          input: createReadStream(filePathObject.path),
+          output: process.stdout,
+          terminal: false
+        });
 
-        if (err) {
-          console.log('err', err);
-        } else {
+        readLineInterface.on('line', (input) => {
+          console.log('line', input);
+          if (currentLine >= filePathObject.line) {
+            console.log('readedLine', input);
+            fileResult.messages.push({ message: input });
+          }
+          currentLine++;
+        });
 
-          content.toString().split('\n').forEach((value) => {
-            fileResult.messages.push({ message: value });
-          });
+        readLineInterface.on('close', () => {
+          filePathObject.line = currentLine;
+          filePathObject.hasChanges = false;
           promiseResult.push(fileResult);
+          currentFileIndex++;
 
-          let newDirectoryName = dirname(fileResult.filePath) + '/processed/';
-          let newFilePath = dirname(fileResult.filePath) + '/processed/' + basename(fileResult.filePath);
-          mkdirp(newDirectoryName, () => {
-            rename(fileResult.filePath, newFilePath, (err) => {
-              console.log('removed', err);
-            });
-          });
-        }
-
-        currentFileIndex++;
-
-        if (filesPaths.length > currentFileIndex) {
-          readFile(filesPaths[currentFileIndex], handleFileReadRecursive);
-        } else {
-          promiseResult.forEach((logMessageContainer) => {
-            var index = this.filesToRead.indexOf(logMessageContainer.filePath);
-            if (index !== -1) {
-              this.filesToRead.splice(index, 1);
-            }
-          });
-          deffered.resolve(promiseResult);
-        }
+          if (filesPaths.length > currentFileIndex) {
+            readFileRecursive(filesPaths[currentFileIndex]);
+          } else {
+            deffered.resolve(promiseResult);
+          }
+        });
       };
 
-      readFile(filesPaths[0], handleFileReadRecursive);
+      readFileRecursive(currentFileObject);
     } else {
       return Q.resolve([]);
     }
@@ -108,15 +106,21 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
   }
 
   onFileAdded = (path: string) => {
-    if (this.filesToRead.indexOf(path) === -1) {
-      this.filesToRead.push(path);
+    let index = this.filesToRead.indexOf(path);
+    if (index === -1) {
+      this.filesToRead.push({ line: 0, path: path, hasChanges: true });
+    } else {
+      this.filesToRead[index].hasChanges = true;
     }
     console.log('onFileAdded', this.filesToRead);
   }
 
   onFileChanged = (path: string) => {
-    if (this.filesToRead.indexOf(path) === -1) {
-      this.filesToRead.push(path);
+    let index = this.filesToRead.findIndex((fileObject) => fileObject.path === path);
+    if (index === -1) {
+      this.filesToRead.push({ line: 0, path: path, hasChanges: true });
+    } else {
+      this.filesToRead[index].hasChanges = true;
     }
     console.log('onFileChanged', this.filesToRead);
   }

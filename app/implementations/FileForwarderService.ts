@@ -2,12 +2,13 @@
 import {FSWatcher} from 'fs';
 import {IForwarderService} from '../interfaces/IForwarderService';
 import {ITextLogsWatcher} from '../interfaces/ITextLogsWatcher';
-import {ILogMessageContainer} from '../interfaces/ILogMessages';
+import {ILogMessageContainer, ILogMessage} from '../interfaces/ILogMessages';
 import {HttpForwarder} from './HttpForwarder';
+import {config} from '../config';
 
 export class FileForwarderService extends HttpForwarder implements IForwarderService {
   constructor(watcher: ITextLogsWatcher) {
-    super();
+    super({ url: config.processorUrl, appId: config.appId });
     if (watcher === null) {
       throw new Error('The watcher is required.');
     }
@@ -22,13 +23,23 @@ export class FileForwarderService extends HttpForwarder implements IForwarderSer
     if (err) {
       console.log('handleNewMessages > err', err);
     } else {
-      this.forward(messagesContainer)
-        .then((result) => {
-          console.log('forwardResult', result);
-        })
-        .catch((err) => {
-          console.log('forwardError', err);
+
+      let messages: ILogMessage[] = [];
+      messagesContainer.forEach((messageContainer) => {
+        messageContainer.messages.forEach((message) => {
+          messages.push(message);
         });
+      });
+      console.log('handleNewMessages > ', messagesContainer);
+      messages.forEach((message) => {
+        this.forward(message)
+          .then((result) => {
+            console.log('forwardResult message', message, 'result', result);
+          })
+          .catch((err) => {
+            console.log('forwardError message', message, 'err', err);
+          });
+      });
     }
   }
 
