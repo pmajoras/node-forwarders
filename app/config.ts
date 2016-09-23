@@ -1,5 +1,5 @@
 export const config = {
-  directoryPath: 'C:/ProjetosGit/node-forwarders/test-directory/*.txt',
-  processorUrl: 'http://localhost:8085/api/processMessage',
-  appId: 'dwqkpkodqwkop'
+  directoryPath: 'C:/inetpub/logs/LogFiles/W3SVC1/*.log',
+  processorUrl: 'https://pgp-logs-app.herokuapp.com/api/processMessage',
+  appId: 'IIS'
 };
