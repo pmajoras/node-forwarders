@@ -1,0 +1,1 @@
+{"version":3,"sources":["common/IDisposable.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC","file":"common/IDisposable.js","sourcesContent":["'use strict';\n\n/**\n* Disposable pattern.\n* @interface IDisposable\n*/\nexport interface IDisposable {\n  dispose(): void;\n}\n\n\n\n"],"sourceRoot":"/source/"}

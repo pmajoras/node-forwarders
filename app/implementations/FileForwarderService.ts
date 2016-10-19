@@ -1,10 +1,10 @@
 'use strict';
-import {FSWatcher} from 'fs';
-import {IForwarderService} from '../interfaces/IForwarderService';
-import {ITextLogsWatcher} from '../interfaces/ITextLogsWatcher';
-import {ILogMessageContainer, ILogMessage} from '../interfaces/ILogMessages';
-import {HttpForwarder} from './HttpForwarder';
-import {config} from '../config';
+import { FSWatcher } from 'fs';
+import { IForwarderService } from '../interfaces/IForwarderService';
+import { ITextLogsWatcher } from '../interfaces/ITextLogsWatcher';
+import { ILogMessageContainer, ILogMessage } from '../interfaces/ILogMessages';
+import { HttpForwarder } from './HttpForwarder';
+import { config } from '../config';
 
 export class FileForwarderService extends HttpForwarder implements IForwarderService {
   constructor(watcher: ITextLogsWatcher) {
@@ -30,16 +30,16 @@ export class FileForwarderService extends HttpForwarder implements IForwarderSer
           messages.push(message);
         });
       });
-      console.log('handleNewMessages > ', messagesContainer);
-      messages.forEach((message) => {
-        this.forward(message)
+
+      if (messages.length > 0) {
+        this.forward(messages)
           .then((result) => {
-            console.log('forwardResult message', message, 'result', result);
+            console.log('forwardResult message', 'result', result);
           })
           .catch((err) => {
-            console.log('forwardError message', message, 'err', err);
+            console.log('forwardError message', 'err', err);
           });
-      });
+      }
     }
   }
 

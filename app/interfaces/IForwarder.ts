@@ -1,12 +1,12 @@
 'use strict';
-import {IDisposable} from '../common/Common';
-import {ILogMessage} from './ILogMessages';
-import {Promise} from 'q';
+import { IDisposable } from '../common/Common';
+import { ILogMessage } from './ILogMessages';
+import { Promise } from 'q';
 
 export interface IForwarder extends IDisposable {
   /**
    *
-   * @param {Array<ILogMessageContainer>} messages
+   * @param {Array<ILogMessage>} messages
    */
-  forward(message: ILogMessage): Promise<any>;
+  forward(messages: Array<ILogMessage>): Promise<any>;
 }

@@ -1,0 +1,1 @@
+{"version":3,"sources":["interfaces/IHttpForwarder.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC","file":"interfaces/IHttpForwarder.js","sourcesContent":["'use strict';\nimport {IForwarder} from './IForwarder';\n\nexport interface IHttpForwarder extends IForwarder {\n}\n"],"sourceRoot":"/source/"}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["interfaces/ILogMessages.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC","file":"interfaces/ILogMessages.js","sourcesContent":["'use strict';\n\nexport interface ILogMessage {\n  line: number;\n  message: string;\n}\n\nexport interface ILogMessageContainer {\n  filePath: string;\n  messages: Array<ILogMessage>;\n}\n"],"sourceRoot":"/source/"}

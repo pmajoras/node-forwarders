@@ -1,14 +1,17 @@
 'use strict';
-import {FSWatcher, readFile, rename, createReadStream} from 'fs';
+import { FSWatcher, readFile, rename, writeFileSync, readFileSync, createReadStream } from 'fs';
 import * as readline from 'readline';
-import {dirname, basename} from 'path';
+import { dirname, basename } from 'path';
 import * as mkdirp from 'mkdirp';
-import {ITextLogsWatcher} from '../interfaces/ITextLogsWatcher';
-import {EventEmitter} from 'events';
+import { ITextLogsWatcher } from '../interfaces/ITextLogsWatcher';
+import { EventEmitter } from 'events';
 import * as Q from 'q';
 import * as chokidar from 'chokidar';
-import {ILogMessageContainer} from '../interfaces/ILogMessages';
+import { ILogMessageContainer } from '../interfaces/ILogMessages';
+import { config } from '../config';
 
+const filesReadJsonPath = config.filesToReadObjectPath;
+const processLoopInSeconds = config.processTimeout;
 const events = {
   newMessage: 'NEW_MESSAGE'
 };
@@ -21,13 +24,27 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
   constructor(config: ITextLogConfig) {
     super();
 
+    try {
+      let filesToReadString = readFileSync(filesReadJsonPath, 'utf8');
+      this.filesToRead = JSON.parse(filesToReadString);
+      console.log('parsed filestoRead', this.filesToRead);
+      if (!Array.isArray(this.filesToRead)) {
+        this.filesToRead = [];
+      }
+    } catch (err) {
+      console.log('filesReadJsonPath >> err', err);
+      // Here you get the error when the file was not found,
+      // but you also get any other error
+    }
+
     this.watcher = chokidar.watch(config.path, {});
     this.watcher
       .on('add', this.onFileAdded)
       .on('change', this.onFileChanged);
-    this.processTimer = setInterval(this.process, 1000 * 10);
+    this.processTimer = setInterval(this.process, 1000 * processLoopInSeconds);
   }
 
+  private isProcessing: Boolean;
   private processTimer: NodeJS.Timer;
   private filesToRead: Array<any> = [];
   private watcher: FSWatcher;
@@ -35,14 +52,19 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
 
   private process = () => {
     console.log('process');
+    if (!this.isProcessing) {
+      this.isProcessing = true;
 
-    this.processFiles(this.filesToRead.filter((file) => file.hasChanges))
-      .then((messagesContainers) => {
-        console.log('messagesContainers', messagesContainers);
-        if (messagesContainers && messagesContainers.length > 0) {
-          this.emit(events.newMessage, null, messagesContainers);
-        }
-      });
+      this.processFiles(this.filesToRead.filter((file) => file.hasChanges))
+        .then((messagesContainers) => {
+          console.log('messagesContainers', messagesContainers);
+          if (messagesContainers && messagesContainers.length > 0) {
+            writeFileSync(filesReadJsonPath, JSON.stringify(this.filesToRead));
+            this.emit(events.newMessage, null, messagesContainers);
+          }
+          this.isProcessing = false;
+        });
+    }
   }
 
   // TODO: Improve performance and create a class for this method.
@@ -106,7 +128,7 @@ export class TextLogsWatcher extends EventEmitter implements ITextLogsWatcher {
   }
 
   onFileAdded = (path: string) => {
-    let index = this.filesToRead.indexOf(path);
+    let index = this.filesToRead.findIndex((fileObject) => fileObject.path === path);
     if (index === -1) {
       this.filesToRead.push({ line: 0, path: path, hasChanges: true });
     } else {
