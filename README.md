@@ -25,10 +25,10 @@ git clone https://github.com/pmajoras/node-forwarders.git
  ```
 
 ## Usage
-
  * Start the process.
+ 
  ```HTML
- c:\..\..\release\ node index
+  c:\..\..\release\ node index
  ```
 
 ## TODO
