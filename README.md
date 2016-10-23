@@ -11,6 +11,10 @@ A client that will be used to send the log messages to the logs processor. (pgp-
 ```HTML
 git clone https://github.com/pmajoras/node-forwarders.git
 ```
+ * Go to the folder and download the dependencies
+ ```HTML
+ npm install
+ ```
  * Open the release/config.js file, and configure the folder wich will be monitored.
  ```HTML
   var path = require('path');
