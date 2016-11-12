@@ -11,7 +11,7 @@ import { ILogMessageContainer } from '../interfaces/ILogMessages';
 import { config } from '../config';
 
 const filesReadJsonPath = config.filesToReadObjectPath;
-const processLoopInSeconds = config.processTimeout;
+const processLoopInSeconds = config.processCicle;
 const events = {
   newMessage: 'NEW_MESSAGE'
 };
